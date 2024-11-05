@@ -4,8 +4,8 @@ It also works if you resize the canvas. You can test it by uncommenting this par
 
   ```css
   /* Uncomment this if you want the canvas to resize
-  width: 100%;
-  height: 100%;  */
+  /* width: 100vw;
+  height: 100vh; */
 ```
 
 ### Usage
