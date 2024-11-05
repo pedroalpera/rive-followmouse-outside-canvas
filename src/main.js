@@ -1,6 +1,11 @@
 // This is the High level JS runtime for Rive
 // https://rive.app/community/doc/web-js/docvlgbnS1mp
 
+const canvas = document.getElementById("canvas");
+if (!canvas) {
+  throw new Error("No canvas element found");
+}
+
 const riveInstance = new rive.Rive({
   src: "catfollowmouse.riv",
   canvas: document.getElementById("canvas"),
@@ -11,53 +16,44 @@ const riveInstance = new rive.Rive({
   onLoad: () => {
     riveInstance.resizeDrawingSurfaceToCanvas();
 
-
-    let Mouse_Target;
-
+    let mouse_Target;
     mouse_Target = riveInstance.artboard.node("Mouse_Target");
 
-    // mouse_Target.x = 250
-    // mouse_Target.y = 220
-    
+    // Mouse Position
+    const mouse = {
+      x: null,
+      y: null,
+    };
 
-  // Mouse Position
-  const mouse = {
-    x: null,
-    y: null,
-  };
+    // Canvas position in the document
+    let rect = canvas.getBoundingClientRect();
 
-  // Canvas position in the document
-  let rect = canvas.getBoundingClientRect();
- 
-  
+    // On Mouse Move
+    document.addEventListener("mousemove", function (event) {
+      detectPosition(event);
+    });
 
-  // On Mouse Move
-  document.addEventListener("mousemove", function (event) {
-    detectPosition(event);
-  });
+    function detectPosition(event) {
+      rect = canvas.getBoundingClientRect();
 
-  function detectPosition(event) {
+      // Calculate the position
+      mouse.x = (Math.floor(event.x - rect.x) * 500) / rect.width;
+      mouse.y = (Math.floor(event.y - rect.y) * 500) / rect.height;
 
-    rect = canvas.getBoundingClientRect();
- 
+      mouse_Target.x = mouse.x;
+      mouse_Target.y = mouse.y;
+    }
 
-    // Calculate the position
-    mouse.x = (Math.floor(event.x - rect.x) * 500)/ rect.width;
-    mouse.y = (Math.floor(event.y - rect.y) * 500)/ rect.height;
+    // Resize Window
+    function computeSize() {
+      riveInstance.resizeDrawingSurfaceToCanvas();
+    }
+    // Subscribe to window size changes and update call `resizeDrawingSurfaceToCanvas`
+    window.onresize = computeSize;
 
-   
-    
-
-    mouse_Target.x = mouse.x;
-    mouse_Target.y = mouse.y;
-
-    // Format text
-    // let positionData = "X: " + mouse.x + "\n" + "Y: " + mouse.y;
-    // console.log(positionData);
-    
-
-  
-  }
-    
+    // Subscribe to devicePixelRatio changes and call `resizeDrawingSurfaceToCanvas`
+    window
+      .matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`)
+      .addEventListener("change", computeSize);
   },
 });
